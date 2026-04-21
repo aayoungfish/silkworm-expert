@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: silkworm-expert-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PORT
+        value: 8787
+      - key: OPENAI_BASE_URL
+        value: https://api.siliconflow.cn/v1
+      - key: OPENAI_MODEL
+        value: deepseek-ai/DeepSeek-V3.2
+      - key: OPENAI_API_KEY
+        sync: false

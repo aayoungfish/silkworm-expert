@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="silkworm-api-base" content="http://localhost:8787" />
+    <title>养蚕专家 - 智能体原型</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="brand-badge">儿童养蚕智能体</div>
+          <h1>养蚕专家</h1>
+          <p>
+            像搜索一样直接提问。你问一句，我就用小朋友听得懂的话来回答，
+            再带你学资料、做题、攒成长积分。
+          </p>
+
+          <div class="search-panel">
+            <div class="search-shell">
+              <textarea
+                id="questionInput"
+                rows="4"
+                placeholder="例如：蚕宝宝不吃桑叶怎么办？"
+              ></textarea>
+              <button id="voiceBtn" class="voice-btn" type="button">按住小话筒</button>
+              <button id="askBtn" class="search-btn">搜索答案</button>
+            </div>
+            <div id="voiceStatus" class="voice-status">
+              小朋友不会打字也没关系，点小话筒直接说。
+            </div>
+
+            <div class="upload-row">
+              <label class="upload-label" for="photoInput">上传照片一起判断</label>
+              <input id="photoInput" type="file" accept="image/*" />
+              <small class="hint"
+                >演示版会参考图片信息辅助判断。</small
+              >
+            </div>
+          </div>
+
+          <div class="quick-tags">
+            <button class="tag" data-question="蚕宝宝不吃桑叶怎么办？">不吃桑叶</button>
+            <button class="tag" data-question="蚕宝宝发黑怎么办？">身体发黑</button>
+            <button class="tag" data-question="养蚕温度多少合适？">温度环境</button>
+          </div>
+        </div>
+
+        <div class="hero-illustration">
+          <svg viewBox="0 0 320 260" class="mascot" aria-hidden="true">
+            <ellipse cx="160" cy="220" rx="95" ry="18" fill="#d8f1d8" />
+            <path
+              d="M70 210 C95 165, 140 150, 200 160 C240 166, 268 188, 278 214 C224 227, 160 230, 70 210Z"
+              fill="#91d47d"
+            />
+            <ellipse cx="170" cy="125" rx="44" ry="35" fill="#fffdf7" />
+            <ellipse cx="140" cy="136" rx="38" ry="32" fill="#fffdf7" />
+            <ellipse cx="112" cy="149" rx="31" ry="27" fill="#fffdf7" />
+            <ellipse cx="198" cy="140" rx="33" ry="28" fill="#fffdf7" />
+            <circle cx="175" cy="110" r="32" fill="#fffdf7" />
+            <circle cx="163" cy="104" r="5" fill="#2f4f65" />
+            <circle cx="186" cy="104" r="5" fill="#2f4f65" />
+            <path
+              d="M165 118 C170 124, 179 124, 184 118"
+              fill="none"
+              stroke="#ff8f8f"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <circle cx="151" cy="115" r="5" fill="#ffd6d6" />
+            <circle cx="198" cy="115" r="5" fill="#ffd6d6" />
+            <path
+              d="M176 73 C186 54, 212 52, 224 67 C213 77, 192 82, 176 73Z"
+              fill="#7ecb66"
+            />
+            <path
+              d="M185 77 C191 67, 203 59, 217 59"
+              fill="none"
+              stroke="#5ca24a"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+          </svg>
+          <div class="bubble">你好呀，我是你的养蚕小老师！</div>
+        </div>
+      </section>
+
+      <section class="result-layout">
+        <article class="card answer-card">
+          <div class="answer-head">
+            <h3>通俗回答</h3>
+            <button id="speakBtn" class="speak-btn" type="button">语音读出来</button>
+          </div>
+          <div id="answerBox" class="answer">
+            还没有提问。你可以像用搜索一样，直接输入你的问题。
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>直接资料</h3>
+          <div id="resourceList" class="resource-grid">
+            <div class="resource-empty">提问后，这里会直接展示可看的内容和小视频脚本。</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>知识小测验</h3>
+          <div id="quizBox" class="quiz-empty">先提问，系统会生成一个小问题。</div>
+        </article>
+      </section>
+
+      <section class="growth-card">
+        <div class="growth-top">
+          <div>
+            <h2>成长积分</h2>
+            <p>答对一题升级一级：蚕卵 -> 一龄幼虫 -> 二龄幼虫 -> 三龄幼虫 -> 四龄幼虫 -> 五龄幼虫 -> 蛹 -> 蛾</p>
+          </div>
+          <button id="resetBtn" class="ghost">重置积分</button>
+        </div>
+
+        <div class="evolution-card">
+          <div class="stage-avatar" id="stageAvatar" aria-hidden="true">🥚</div>
+          <div class="stage-meta">
+            <div class="score-line">
+              当前积分：<strong id="scoreText">0</strong>
+              <span class="split">|</span>
+              当前成长阶段：<strong id="stageText">蚕卵</strong>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-track">
+                <div id="growthBar" class="progress-fill"></div>
+              </div>
+              <div class="progress-steps" id="growthTrack">
+                <span class="stage" data-stage="0">蚕卵</span>
+                <span class="stage" data-stage="1">一龄</span>
+                <span class="stage" data-stage="2">二龄</span>
+                <span class="stage" data-stage="3">三龄</span>
+                <span class="stage" data-stage="4">四龄</span>
+                <span class="stage" data-stage="5">五龄</span>
+                <span class="stage" data-stage="6">蛹</span>
+                <span class="stage" data-stage="7">蛾</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="rewardBox" class="reward locked">继续答题，蚕宝宝会越来越可爱。</div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
