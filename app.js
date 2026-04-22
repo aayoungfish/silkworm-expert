@@ -44,7 +44,7 @@ const STAGES = [
   "蛹",
   "蛾",
 ];
-const STAGE_AVATARS = ["🥚", "🐛", "🐛", "🐛", "🐛", "🐛", "🧺", "🦋"];
+const LARVA_SCALES = [0, 0.84, 0.9, 0.97, 1.05, 1.12];
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
@@ -347,7 +347,7 @@ function renderScore() {
   scoreText.textContent = String(score);
   const stageIndex = Math.min(score, STAGES.length - 1);
   stageText.textContent = STAGES[stageIndex];
-  stageAvatar.textContent = STAGE_AVATARS[stageIndex];
+  stageAvatar.innerHTML = getStageAvatarSvg(stageIndex);
   const percent = (stageIndex / (STAGES.length - 1)) * 100;
   growthBar.style.width = `${percent}%`;
 
@@ -366,6 +366,60 @@ function renderScore() {
     rewardBox.classList.add("locked");
     rewardBox.textContent = `再答对 ${finalScore - score} 题，蚕宝宝会继续升级。`;
   }
+}
+
+function getStageAvatarSvg(stageIndex) {
+  if (stageIndex === 0) {
+    return `
+      <svg viewBox="0 0 120 120" class="stage-svg" aria-hidden="true">
+        <ellipse cx="60" cy="102" rx="28" ry="8" fill="#dbe7d9" />
+        <ellipse cx="60" cy="58" rx="24" ry="31" fill="#f9f7ef" stroke="#d9d4c8" stroke-width="3" />
+        <ellipse cx="53" cy="50" rx="6" ry="8" fill="#fffdf8" />
+      </svg>
+    `;
+  }
+
+  if (stageIndex >= 1 && stageIndex <= 5) {
+    const scale = LARVA_SCALES[stageIndex] || 1;
+    return `
+      <svg viewBox="0 0 120 120" class="stage-svg" aria-hidden="true">
+        <ellipse cx="60" cy="100" rx="38" ry="8" fill="#dbe7d9" />
+        <g transform="translate(60 62) scale(${scale}) translate(-60 -62)">
+          <ellipse cx="44" cy="64" rx="16" ry="14" fill="#fbfaf5" stroke="#dbd6ca" stroke-width="2.4" />
+          <ellipse cx="58" cy="63" rx="17" ry="15" fill="#fbfaf5" stroke="#dbd6ca" stroke-width="2.4" />
+          <ellipse cx="74" cy="62" rx="18" ry="16" fill="#fbfaf5" stroke="#dbd6ca" stroke-width="2.4" />
+          <ellipse cx="90" cy="61" rx="16" ry="14" fill="#fbfaf5" stroke="#dbd6ca" stroke-width="2.4" />
+          <circle cx="95" cy="57" r="2.3" fill="#2f4f65" />
+          <path d="M86 68 C90 71, 94 71, 97 68" fill="none" stroke="#ff9a9a" stroke-width="2.4" stroke-linecap="round" />
+        </g>
+      </svg>
+    `;
+  }
+
+  if (stageIndex === 6) {
+    return `
+      <svg viewBox="0 0 120 120" class="stage-svg" aria-hidden="true">
+        <ellipse cx="60" cy="100" rx="34" ry="8" fill="#dbe7d9" />
+        <path d="M60 28 C79 36, 89 57, 82 77 C75 93, 59 97, 47 90 C33 82, 29 63, 37 48 C42 38, 50 31, 60 28Z"
+          fill="#efe6cb" stroke="#d4c9ab" stroke-width="3"/>
+        <path d="M51 43 C65 47, 72 58, 68 76" fill="none" stroke="#d4c9ab" stroke-width="2.2" stroke-linecap="round" />
+      </svg>
+    `;
+  }
+
+  return `
+    <svg viewBox="0 0 120 120" class="stage-svg" aria-hidden="true">
+      <ellipse cx="60" cy="98" rx="34" ry="8" fill="#dbe7d9" />
+      <ellipse cx="60" cy="62" rx="16" ry="18" fill="#f0ece4" stroke="#c9c1b5" stroke-width="2.4" />
+      <path d="M58 43 C46 35, 32 36, 23 48 C32 56, 46 56, 58 52Z" fill="#efe8da" stroke="#c9c1b5" stroke-width="2.2" />
+      <path d="M62 43 C74 35, 88 36, 97 48 C88 56, 74 56, 62 52Z" fill="#efe8da" stroke="#c9c1b5" stroke-width="2.2" />
+      <circle cx="56" cy="60" r="2.2" fill="#2f4f65" />
+      <circle cx="64" cy="60" r="2.2" fill="#2f4f65" />
+      <path d="M56 68 C58 70, 62 70, 64 68" fill="none" stroke="#ff9a9a" stroke-width="2.2" stroke-linecap="round" />
+      <path d="M54 45 C50 38, 46 34, 42 31" fill="none" stroke="#7a6f64" stroke-width="2" stroke-linecap="round" />
+      <path d="M66 45 C70 38, 74 34, 78 31" fill="none" stroke="#7a6f64" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  `;
 }
 
 function isReliableLink(link) {
