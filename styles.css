@@ -108,6 +108,26 @@ button {
   font-weight: 700;
 }
 
+.search-btn.loading {
+  position: relative;
+  padding-left: 44px;
+  opacity: 0.95;
+}
+
+.search-btn.loading::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  animation: spin 0.75s linear infinite;
+}
+
 .voice-btn {
   flex-shrink: 0;
   padding: 14px 18px;
@@ -115,6 +135,9 @@ button {
   background: #fff4da;
   color: #8a6500;
   font-weight: 700;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .voice-btn.listening {
@@ -466,6 +489,12 @@ button {
 
 .quiz-feedback.bad {
   color: var(--warn);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 960px) {

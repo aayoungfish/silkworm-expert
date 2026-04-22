@@ -80,6 +80,7 @@ async function askQuestion() {
     return;
   }
 
+  setAskLoading(true);
   answerBox.textContent = "我在思考中，请稍等...";
   resourceList.innerHTML = '<div class="resource-empty">正在整理简单资料...</div>';
   quizBox.textContent = "正在出题...";
@@ -97,11 +98,19 @@ async function askQuestion() {
     resourceList.innerHTML =
       '<div class="resource-empty">可先用语音提问再试，或确认后端服务是否在运行。</div>';
     quizBox.textContent = "服务恢复后可继续答题。";
+  } finally {
+    setAskLoading(false);
   }
 
   setTimeout(() => {
     answerCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 80);
+}
+
+function setAskLoading(loading) {
+  askBtn.disabled = Boolean(loading);
+  askBtn.classList.toggle("loading", Boolean(loading));
+  askBtn.textContent = loading ? "思考中..." : "搜索答案";
 }
 
 async function askWithModel(question, file) {
@@ -148,12 +157,56 @@ function setupVoiceInput() {
   recognition.interimResults = true;
   recognition.continuous = false;
 
-  voiceBtn.addEventListener("click", () => {
-    if (isListening) {
+  let pressMode = false;
+
+  function startListening() {
+    if (isListening) return;
+    try {
+      recognition.start();
+    } catch {
+      // 某些浏览器会在短时间重复 start 时抛异常，忽略即可
+    }
+  }
+
+  function stopListening() {
+    if (!isListening) return;
+    try {
       recognition.stop();
+    } catch {
+      // 忽略停止阶段异常
+    }
+  }
+
+  // 桌面/不支持按住时：点击切换
+  voiceBtn.addEventListener("click", () => {
+    if (pressMode) return;
+    if (isListening) {
+      stopListening();
       return;
     }
-    recognition.start();
+    startListening();
+  });
+
+  // 手机优先：按住说话，松手结束
+  voiceBtn.addEventListener("pointerdown", (e) => {
+    pressMode = true;
+    e.preventDefault();
+    startListening();
+  });
+  voiceBtn.addEventListener("pointerup", () => {
+    stopListening();
+    setTimeout(() => {
+      pressMode = false;
+    }, 120);
+  });
+  voiceBtn.addEventListener("pointercancel", () => {
+    stopListening();
+    setTimeout(() => {
+      pressMode = false;
+    }, 120);
+  });
+  voiceBtn.addEventListener("pointerleave", () => {
+    if (pressMode) stopListening();
   });
 
   recognition.onstart = () => {
@@ -171,10 +224,15 @@ function setupVoiceInput() {
     voiceStatus.textContent = `我听到的是：${questionInput.value || "请再说一次"}`;
   };
 
-  recognition.onerror = () => {
+  recognition.onerror = (event) => {
     isListening = false;
     voiceBtn.classList.remove("listening");
     voiceBtn.textContent = "按住小话筒";
+    const err = String(event?.error || "");
+    if (err === "not-allowed") {
+      voiceStatus.textContent = "请允许麦克风权限后再试一次。";
+      return;
+    }
     voiceStatus.textContent = "没有听清楚，可以再点一次小话筒重新说。";
   };
 
